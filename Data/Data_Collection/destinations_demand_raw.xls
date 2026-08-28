@@ -1,0 +1,27 @@
+destination_id,destination,demand,required_quantity,priority
+DEST0040,Kuwait City,Very High,1472.0,Critical
+DEST0009,Ahmedabad,Very High,1439.0,Critical
+DEST0043,Toronto,Very High,1386.0,Critical
+DEST0050,Colombo,,1309.0,Critical
+DEST0011,Jakarta,Very High,1137.0,Critical
+DEST0076,Paris,Very High,1082.0,Critical
+DEST0054,Nairobi,Very High,962.0,Critical
+DEST0100,Kuwait City,Very High,,Critical
+DEST0032,Chicago,Very High,1458.0,High
+DEST0012,Kolkata,Very High,1440.0,High
+DEST0022,Rome,Very High,1371.0,High
+DEST0093,São Paulo,Very High,1276.0, critical 
+DEST0078,Perth,Very High,1025.0,High
+DEST0084,New York,High,897.0,High
+DEST0056,Vancouver,High,894.0,High
+DEST0007,Toronto,High,866.0,High
+DEST0041,Kochi,High,857.0,High
+DEST0098,DUBAI,High,829.0,High
+DEST0095,Melbourne,High,822.0,High
+DEST0023,Abu Dhabi,High,818.0,High
+DEST0083,Ahmedabad,High,-100.0,High
+DEST0073,Vancouver,High,814.0,High
+DEST0006,Kochi,High,757.0,High
+DEST0033,Dhaka,High,753.0,High
+DEST0063,Johannesburg,High,753.0,High
+DEST0076,Paris,Very High,1082.0,Critical
