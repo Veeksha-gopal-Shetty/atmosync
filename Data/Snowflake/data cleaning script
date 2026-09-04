@@ -1,0 +1,44 @@
+-- Step 1: Set database and schema context
+USE DATABASE ATMOSYNC;
+USE SCHEMA STAGING;
+
+-- Step 2: Ensure the target staging table exists
+CREATE TABLE IF NOT EXISTS ATMOSYNC.STAGING.VACCINE_SHIPMENT_STAGING (
+    SHIPMENT_ID        VARCHAR(50)      NOT NULL,
+    CONTAINER_ID       VARCHAR(50),
+    VACCINE_TYPE       VARCHAR(100)     NOT NULL,
+    BATCH_ID           VARCHAR(50),
+    QUANTITY           INT              CHECK (QUANTITY >= 0),
+    CLEANED_AT         TIMESTAMP_NTZ    DEFAULT CURRENT_TIMESTAMP(),
+    CONSTRAINT PK_SHIPMENT PRIMARY KEY (SHIPMENT_ID)
+);
+
+-- Step 3: Clear any existing staging records before loading fresh data
+TRUNCATE TABLE ATMOSYNC.STAGING.VACCINE_SHIPMENT_STAGING;
+
+-- Step 4: Transform, clean, and insert data from RAW to STAGING
+INSERT INTO ATMOSYNC.STAGING.VACCINE_SHIPMENT_STAGING (
+    SHIPMENT_ID,
+    CONTAINER_ID,
+    VACCINE_TYPE,
+    BATCH_ID,
+    QUANTITY
+)
+SELECT 
+    -- Remove leading/trailing whitespace from text fields
+    TRIM(SHIPMENT_ID) AS SHIPMENT_ID,
+    TRIM(CONTAINER_ID) AS CONTAINER_ID,
+    
+    -- Replace missing vaccine types with 'Unknown'
+    COALESCE(TRIM(VACCINE_TYPE), 'Unknown') AS VACCINE_TYPE,
+    
+    TRIM(BATCH_ID) AS BATCH_ID,
+    
+    -- Ensure quantities are non-null and non-negative
+    GREATEST(COALESCE(QUANTITY, 0), 0) AS QUANTITY
+
+FROM ATMOSYNC.PUBLIC.VACCINE_SHIPMENTS_RAW
+WHERE SHIPMENT_ID IS NOT NULL;
+
+-- Step 5: Verify the cleaned data in the results panel
+SELECT * FROM ATMOSYNC.STAGING.VACCINE_SHIPMENT_STAGING LIMIT 10;
