@@ -1,6 +1,21 @@
 -- ============================================================
 -- AtmoSync - Snowflake Database Setup
 -- ============================================================
+-- Purpose:
+--   Creates the core Snowflake environment required for the
+--   AtmoSync project.
+--
+-- Includes:
+--   Database
+--   Schemas
+--   Warehouse
+--   Stages
+--   CSV file format
+--   IoT RAW and STAGING tables
+--
+-- This script is safe to re-run because CREATE statements use
+-- IF NOT EXISTS.
+-- ============================================================
 
 
 -- ============================================================
@@ -15,7 +30,9 @@ CREATE DATABASE IF NOT EXISTS ATMOSYNC;
 -- ============================================================
 
 CREATE SCHEMA IF NOT EXISTS ATMOSYNC.RAW;
+
 CREATE SCHEMA IF NOT EXISTS ATMOSYNC.STAGING;
+
 CREATE SCHEMA IF NOT EXISTS ATMOSYNC.ANALYTICS;
 
 
@@ -95,7 +112,3 @@ CREATE TABLE IF NOT EXISTS ATMOSYNC.STAGING.IOT_CLEAN (
 -- END OF ATMOSYNC SNOWFLAKE SETUP
 -- ============================================================
 
--- NOTE:
--- Data-loading commands are intentionally not included here.
--- Raw and cleaned files are loaded separately into their
--- corresponding stages/tables.
