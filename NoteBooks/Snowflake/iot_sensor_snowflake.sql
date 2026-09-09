@@ -2,11 +2,19 @@
 -- AtmoSync - IoT Sensor Data | Snowflake Ingestion & Validation
 -- ============================================================
 
+-- This script creates the IoT RAW/STAGING objects, loads the
+-- cleaned IoT CSV, and runs data-quality validation checks.
+--
+-- Expected cleaned dataset size: 50,000 rows
+-- The script is designed to be safely re-runnable.
+-- ============================================================
+
 
 -- ============================================================
--- 1. USE RAW SCHEMA
+-- 1. DATABASE / SCHEMA CONTEXT
 -- ============================================================
 
+USE DATABASE ATMOSYNC;
 USE SCHEMA ATMOSYNC.RAW;
 
 
@@ -56,11 +64,9 @@ SELECT *
 FROM ATMOSYNC.RAW.IOT_SENSOR_READINGS
 LIMIT 10;
 
-
 -- Check total RAW rows
 SELECT COUNT(*) AS TOTAL_ROWS
 FROM ATMOSYNC.RAW.IOT_SENSOR_READINGS;
-
 
 -- Check NULL values
 SELECT
@@ -75,7 +81,6 @@ SELECT
     COUNT_IF(LONGITUDE IS NULL) AS NULL_LONGITUDE
 FROM ATMOSYNC.RAW.IOT_SENSOR_READINGS;
 
-
 -- Check duplicate Reading IDs
 SELECT
     READING_ID,
@@ -84,7 +89,6 @@ FROM ATMOSYNC.RAW.IOT_SENSOR_READINGS
 GROUP BY READING_ID
 HAVING COUNT(*) > 1
 ORDER BY CNT DESC;
-
 
 -- Check sensor and GPS ranges
 SELECT
@@ -99,7 +103,6 @@ SELECT
     MIN(LONGITUDE) AS MIN_LONGITUDE,
     MAX(LONGITUDE) AS MAX_LONGITUDE
 FROM ATMOSYNC.RAW.IOT_SENSOR_READINGS;
-
 
 -- Check invalid values
 SELECT
@@ -155,8 +158,16 @@ LIMIT 5;
 
 
 -- ============================================================
--- 9. LOAD CLEANED IoT DATA
+-- 9. SAFE CLEANED IoT DATA LOAD
 -- ============================================================
+-- Remove the existing staging rows before reloading the
+-- cleaned CSV. This prevents duplicate rows if this script
+-- is intentionally re-run.
+--
+-- NOTE: This assumes data2_clean.csv is the authoritative
+-- cleaned IoT dataset for this table.
+
+TRUNCATE TABLE ATMOSYNC.STAGING.IOT_CLEAN;
 
 INSERT INTO ATMOSYNC.STAGING.IOT_CLEAN
 SELECT
@@ -182,13 +193,19 @@ SELECT *
 FROM ATMOSYNC.STAGING.IOT_CLEAN
 LIMIT 10;
 
-
 -- Check cleaned row count
+-- Expected: 50,000
 SELECT COUNT(*) AS TOTAL_ROWS
 FROM ATMOSYNC.STAGING.IOT_CLEAN;
 
-
 -- Final quality check
+-- Expected:
+-- TOTAL_ROWS = 50,000
+-- UNIQUE_READING_IDS = 50,000
+-- NULL_READING_ID = 0
+-- NULL_TEMPERATURE = 0
+-- NULL_HUMIDITY = 0
+-- NULL_VIBRATION = 0
 SELECT
     COUNT(*) AS TOTAL_ROWS,
     COUNT(DISTINCT READING_ID) AS UNIQUE_READING_IDS,
